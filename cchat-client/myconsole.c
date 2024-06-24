@@ -33,8 +33,8 @@ int sety(int y) {
 	y_pos = y;
 }
 
-static char msg[1000];
-static char tmp_msg[1000];
+static wchar_t msg[1000];
+static wchar_t tmp_msg[1000];
 static int tmp_msg_size = 0;
 
 char* get_msg() {
@@ -47,7 +47,7 @@ int get_tmp_msg_size() {
 
 char* run_my_console() {
 
-	int ch;
+	wchar_t ch;
 	int msg_idx = 0;
 
 	while (1) {
@@ -55,36 +55,37 @@ char* run_my_console() {
 
 		if (_kbhit()) {
 
-			ch = _getch();  // getch()는 키보드 입력을 읽어옵니다.
+			ch = _getwch();  // getch()는 키보드 입력을 읽어옵니다.
 
 			// 'q' 키가 입력되면 루프를 종료합니다.
 			if (ch == '0') {
 				break;
 			}
 
-			if (ch == 13) {
-				tmp_msg[msg_idx++] = '\n';
-				tmp_msg[msg_idx] = '\0';
+			if (ch == L'\n') {
+				tmp_msg[msg_idx++] = L'\n';
+				tmp_msg[msg_idx] = L'\0';
 				memcpy(msg, tmp_msg, sizeof(msg));
 				y_pos++;
 				x_pos = 20;
-				tmp_msg[0] = '\0';
+				memset(tmp_msg, '\0', 1000);
 				tmp_msg_size = 0;
+				msg_idx = 0;
 				return msg;
 			}
 
-			else if (ch == 8 && x_pos > 20) {
+			else if (ch == L'\b' && x_pos > 20) {
 				msg_idx--;
 				gotoxy(--x_pos, y_pos);
 				printf("%c", ' ');
 				gotoxy(x_pos, y_pos);
 			}
-			else if (ch != 8) {
-				tmp_msg[msg_idx++] = ch;
-				tmp_msg_size++;
+			else if (ch != L'\b') {
+				tmp_msg[tmp_msg_size++] = ch;
+				msg_idx++;
 				gotoxy(x_pos, y_pos);
 				x_pos++;
-				printf("%c", ch);
+				wprintf(L"%lc", ch);
 			}
 
 		}

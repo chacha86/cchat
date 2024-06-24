@@ -4,6 +4,8 @@
 #include <pthread.h>
 #include <winsock2.h>
 #include <conio.h>
+#include <windows.h>
+#include "myconsole.h"
 #pragma comment(lib, "ws2_32")
 
 //int sharedData = 0;
@@ -24,29 +26,48 @@ typedef struct _ChatMessage {
 
 ChatMessage* msg_list[100];
 int msg_size = 0;
+int is_first = 1;
 
 int user_id;
 char name[20];
 
+char chat_tmp[100];
+int tmp_idx = 0;
+
+pthread_mutex_t mutex;
+
+char* printChatConsole() {
+
+	char* msg = run_my_console();
+	return msg;
+}
 void send_msg(SOCKET csock) {
+	pthread_mutex_lock(&mutex);
+	printf("========================================================\n");
+	printf("보낼 메시지 입력 : ");
 	while (1) {
 		char sbuff[1024] = { 0 };
-
-		// strcpy 문자열 복사 함수
-		printf("========================================================\n");
-		printf("보낼 메시지 입력 : ");
-		fgets(sbuff, 100, stdin);
+		char* msg = printChatConsole();
+		//fgets(sbuff, 100, stdin);
 		ChatMessage chat_message;
 		chat_message.userid = user_id;
 		memcpy(chat_message.name, name, sizeof(chat_message.name));
-		memcpy(chat_message.msg, sbuff, sizeof(chat_message.msg));
+		memcpy(chat_message.msg, msg, sizeof(chat_message.msg));
 		memcpy(sbuff, &chat_message, sizeof(chat_message));
 		send(csock, sbuff, 1024, 0);
+		is_first = 0;
 	}
+
 }
 
 void recv_msg(SOCKET csock) {
+
+	pthread_mutex_lock(&mutex);
 	while (1) {
+		if (is_first) {
+			continue;
+		}
+
 		char rbuff[1024] = { 0 };
 		recv(csock, rbuff, 1024, 0);
 
@@ -58,10 +79,16 @@ void recv_msg(SOCKET csock) {
 		for (int i = 0; i < msg_size; i++) {
 			printf("%s(%d) : %s", msg_list[i]->name, msg_list[i]->userid, msg_list[i]->msg);
 		}
-
+		sety(msg_size);
+		int tox = get_tmp_msg_size();
+		char* tmp_msg = get_msg();
 		printf("========================================================\n");
 		printf("보낼 메시지 입력 : ");
+		printf("%s", tmp_msg);
+		setx(tox);
+
 	}
+	pthread_mutex_unlock(&mutex);
 }
 
 void init(SOCKET csock) {
@@ -82,12 +109,14 @@ void init(SOCKET csock) {
 	while (1) {
 		char c = _getch();
 		if (c == 13) {
+			system("cls");
 			break;
 		}
 	}
 
 
 }
+
 int main() {
 
 	/*pthread_t threads[2];

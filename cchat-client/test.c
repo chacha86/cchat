@@ -5,6 +5,7 @@
 #include <winsock2.h>
 #include <conio.h>
 #include <windows.h>
+#include <locale.h>
 #include "myconsole.h"
 #pragma comment(lib, "ws2_32")
 
@@ -21,7 +22,7 @@
 typedef struct _ChatMessage {
 	int userid;
 	char name[20];
-	char msg[100];
+	wchar_t msg[100];
 } ChatMessage;
 
 ChatMessage* msg_list[100];
@@ -29,22 +30,25 @@ int msg_size = 0;
 int is_first = 1;
 
 int user_id;
-char name[20];
+wchar_t name[20];
 
-char chat_tmp[100];
+wchar_t chat_tmp[100];
 int tmp_idx = 0;
 
-char* printChatConsole() {
+pthread_mutex_t mutex;
 
-	char* msg = run_my_console();
+wchar_t* printChatConsole() {
+
+	wchar_t* msg = run_my_console();
 	return msg;
 }
 void send_msg(SOCKET csock) {
+	pthread_mutex_lock(&mutex);
 	printf("========================================================\n");
 	printf("보낼 메시지 입력 : ");
 	while (1) {
-		char sbuff[1024] = { 0 };
-		char* msg = printChatConsole();
+		wchar_t sbuff[1024] = { 0 };
+		wchar_t* msg = printChatConsole();
 		//fgets(sbuff, 100, stdin);
 		ChatMessage chat_message;
 		chat_message.userid = user_id;
@@ -54,15 +58,18 @@ void send_msg(SOCKET csock) {
 		send(csock, sbuff, 1024, 0);
 		is_first = 0;
 	}
+
 }
 
 void recv_msg(SOCKET csock) {
+
+	pthread_mutex_lock(&mutex);
 	while (1) {
 		if (is_first) {
 			continue;
 		}
 
-		char rbuff[1024] = { 0 };
+		wchar_t rbuff[1024] = { 0 };
 		recv(csock, rbuff, 1024, 0);
 
 		ChatMessage* chat_message = (ChatMessage*)malloc(sizeof(ChatMessage));
@@ -71,21 +78,22 @@ void recv_msg(SOCKET csock) {
 
 		system("cls");
 		for (int i = 0; i < msg_size; i++) {
-			printf("%s(%d) : %s", msg_list[i]->name, msg_list[i]->userid, msg_list[i]->msg);
+			wprintf("%ls(%d) : %ls", msg_list[i]->name, msg_list[i]->userid, msg_list[i]->msg);
 		}
 		sety(msg_size);
 		int tox = get_tmp_msg_size();
-		char* tmp_msg = get_msg();
+		wchar_t* tmp_msg = get_msg();
 		printf("========================================================\n");
 		printf("보낼 메시지 입력 : ");
 		printf("%s", tmp_msg);
 		setx(tox);
 
 	}
+	pthread_mutex_unlock(&mutex);
 }
 
 void init(SOCKET csock) {
-	char rbuff[100] = { 0 };
+	wchar_t rbuff[100] = { 0 };
 	recv(csock, rbuff, 100, 0);
 	memcpy(&user_id, rbuff, sizeof(user_id));
 	/*unsigned char chat_size = sizeof(ChatMessage);
@@ -95,8 +103,9 @@ void init(SOCKET csock) {
 
 
 	printf("이름을 입력해주세요 : ");
-	scanf_s("%s", name, 20);
-	printf("안녕하세요 %s(%d)님!", name, user_id);
+	//scanf_s("%s", name, 20);
+	wscanf_s(L"%s", name, 20);
+	wprintf("안녕하세요 %s(%d)님!", name, user_id);
 	printf("계속하려면 엔터를 누르세요\n");
 
 	while (1) {
@@ -109,7 +118,10 @@ void init(SOCKET csock) {
 
 
 }
+
 int main() {
+
+	setlocale(LC_ALL, "");  // 로케일 설정
 
 	/*pthread_t threads[2];
 	pthread_mutex_init(&mutex, NULL);
