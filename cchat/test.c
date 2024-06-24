@@ -4,55 +4,90 @@
 #include <winsock2.h>
 #pragma comment(lib, "ws2_32")
 
-//int sharedData = 0;
-//pthread_mutex_t mutex;
-//void push() {
-//	for (int i = 0; i < 100000; i++) {
-//		pthread_mutex_lock(&mutex);
-//		sharedData++;
-//		pthread_mutex_unlock(&mutex);
+long long user_list[100] = {-1};
+int user_size = 0;
+
+typedef struct _ChatMessage {
+	int userid;
+	char name[20];
+	char msg[100];
+} ChatMessage;
+
+//void send_msg(SOCKET csock) {
+//	while (1) {
+//		char sbuff[100] = { 0 };
+//
+//		// strcpy 문자열 복사 함수
+//		send(csock, sbuff, 100, 0);
 //	}
 //}
-void send_msg(SOCKET csock) {
-	while (1) {
-		char sbuff[100] = { 0 };
-
-		// strcpy 문자열 복사 함수
-
-		printf("보낼 메시지 입력 : ");
-		scanf_s("%s", sbuff, 100);
-		send(csock, sbuff, 100, 0);
-	}
-}
-
 void recv_msg(SOCKET csock) {
 	while (1) {
-		char rbuff[100] = { 0 };
-		recv(csock, rbuff, 100, 0);
+		char rbuff[1024] = { 0 };
+		recv(csock, rbuff, 1024, 0);
+		//ChatMessage chat_message;
+		//memcpy(&chat_message, rbuff, sizeof(ChatMessage));
 
-		printf("%s", rbuff);
+		for (int i = 0; i < user_size; i++) {
+			SOCKET target = user_list[i];
+			send(target, rbuff, 1024, 0);
+		}
 	}
 }
+
+void my_accept(SOCKET sock) {
+	SOCKADDR_IN caddr;
+	SOCKET csock;
+	int csize = sizeof(caddr);
+
+	csock = accept(sock, (SOCKADDR_IN*)&caddr, &csize);
+	if (csock < 0) {
+		exit(1);
+	}
+
+	if (csock == SOCKET_ERROR) {
+		printf("연결 수립중 에러 발생!!\n");
+		exit(1);
+	}
+
+	printf("연결 성공!!\n");
+	printf("연결된 소켓 번호 : %d \n", csock);
+
+	char rbuff[1024] = { 0 };
+	user_list[user_size++] = csock;
+	int size = sizeof(csock);
+
+	memcpy(rbuff, &csock, sizeof(csock));
+	send(csock, rbuff, 1024, 0);
+	recv(csock, rbuff, 1024, 0);
+	// 8. 데이터 송수신 - send() / recv()
+	// send(sock, buff, len, flags)
+	// recv(sock, buff, len, flags)
+	// sock : send - 데이터를 보낼 대상 소켓, recv - 데이터를 받을 대상 소켓
+	// buff : send - 보낼 데이터를 담은 버퍼, recv - 받은 데이터를 담을 버퍼
+	// len : 버퍼의 크기
+	// flags : 일반적으로 0
+
+	// 클라이언트에 데이터 보내기
+	pthread_t t2;
+	//pthread_create(&t1, NULL, init, csock);
+	pthread_create(&t2, NULL, recv_msg, csock);
+
+	//pthread_join(t1, NULL);
+	pthread_join(t2, NULL);
+
+	closesocket(sock);
+	printf("소켓 닫기 완료!!\n");
+
+	WSACleanup();
+	printf("winsock 자원 반납\n");
+
+}
 int main() {
-
-	/*pthread_t threads[2];
-	pthread_mutex_init(&mutex, NULL);
-
-	if (pthread_create(&threads[0], NULL, push, NULL) != 0) {
-		fprintf(stderr, "Error");
-	}
-
-	if (pthread_create(&threads[1], NULL, push, NULL) != 0) {
-		fprintf(stderr, "Error");
-	}
-
-	pthread_join(threads[0], NULL);
-	pthread_join(threads[1], NULL);
-
-	printf("%d\n", sharedData);*/
-
+	//const MSG_CAPACITY = 1000;
 
 	WSADATA wsadata;
+	//char** msgList = (char**)malloc(sizeof(char*) * MSG_CAPACITY); // 총 1000개의 메시지 저장
 
 	// 초기화 성공 0, 실패 -1
 	if (WSAStartup(MAKEWORD(2, 2), &wsadata) != 0) {
@@ -77,14 +112,11 @@ int main() {
 
 	printf("소켓 생성 완료!!\n");
 
-
 	// 4. 주소와 포트번호 설정
 	// sin_family : 주소체계
 	// sin_port : 포트번호
 	// sin_addr : IP 주소 (ADDR_ANY 로컬의 주소를 자동 세팅)
 	// htons : 리틀인디안 > 빅인디안 
-
-
 
 	SOCKADDR_IN addr;
 	addr.sin_family = AF_INET;
@@ -119,19 +151,30 @@ int main() {
 	// caddrlen - caddr의 크기
 	// return : 연결 요청한 클라이언트의 소켓 정보
 
-	SOCKADDR_IN caddr;
+	/*SOCKADDR_IN caddr;
 	SOCKET csock;
 	int csize = sizeof(caddr);
 
 	csock = accept(sock, (SOCKADDR_IN*)&caddr, &csize);
+	if (csock < 0) {
+		exit(1);
+	}
 
 	if (csock == SOCKET_ERROR) {
 		printf("연결 수립중 에러 발생!!\n");
+		exit(1);
 	}
 
 	printf("연결 성공!!\n");
-	printf("연결된 소켓 번호 : %d \n", csock); 
+	printf("연결된 소켓 번호 : %d \n", csock);
 
+	char rbuff[1024] = { 0 };
+	user_list[user_size++] = csock;
+	int size = sizeof(csock);
+
+	memcpy(rbuff, &csock, sizeof(csock));
+	send(csock, rbuff, 1024, 0);
+	recv(csock, rbuff, 1024, 0); */
 	// 8. 데이터 송수신 - send() / recv()
 	// send(sock, buff, len, flags)
 	// recv(sock, buff, len, flags)
@@ -141,20 +184,24 @@ int main() {
 	// flags : 일반적으로 0
 
 	// 클라이언트에 데이터 보내기
-	pthread_t t1;
-	pthread_t t2;
-	pthread_create(&t1, NULL, send_msg, csock);
-	pthread_create(&t2, NULL, recv_msg, csock);
+	for (int i = 0; i < 5; i++) {
+		pthread_t t1;
+		pthread_create(&t1, NULL, my_accept, sock);
+		pthread_detach(t1);
+	}
 
-	pthread_join(t1, NULL);
-	pthread_join(t2, NULL);
-	
+	while (1);
+	//pthread_create(&t2, NULL, recv_msg, csock);
 
-	closesocket(sock);
-	printf("소켓 닫기 완료!!\n");
+	//pthread_join(t1, NULL);
+	//pthread_join(t2, NULL);
 
-	WSACleanup();
-	printf("winsock 자원 반납\n");
+
+	//closesocket(sock);
+	//printf("소켓 닫기 완료!!\n");
+
+	//WSACleanup();
+	//printf("winsock 자원 반납\n");
 
 	
 
