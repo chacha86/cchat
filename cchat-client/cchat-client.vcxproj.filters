@@ -18,5 +18,16 @@
     <ClCompile Include="test.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="myconsole.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="chatview.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="myconsole.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

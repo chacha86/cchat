@@ -15,8 +15,19 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test.c">
+    <ClCompile Include="..\cchat-client\test.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="..\cchat-client\myconsole.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cchat-client\chatview.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\cchat-client\myconsole.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

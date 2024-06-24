@@ -130,7 +130,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="test.c" />
+    <ClCompile Include="..\cchat-client\chatview.c" />
+    <ClCompile Include="..\cchat-client\myconsole.c" />
+    <ClCompile Include="..\cchat-client\test.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\cchat-client\myconsole.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

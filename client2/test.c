@@ -35,7 +35,7 @@ void send_msg(SOCKET csock) {
 		// strcpy 문자열 복사 함수
 		printf("========================================================\n");
 		printf("보낼 메시지 입력 : ");
-		//fgets(sbuff, 100, stdin);
+		fgets(sbuff, 100, stdin);
 		ChatMessage chat_message;
 		chat_message.userid = user_id;
 		memcpy(chat_message.name, name, sizeof(chat_message.name));
@@ -147,6 +147,7 @@ int main() {
 
 	if (connect(sock, (SOCKADDR_IN*)&addr, sizeof(addr)) != 0) {
 		printf("서버에 연결 시도중 문제 발생!!\n");
+		exit(1);
 	}
 
 	printf("%d\n", sock);
