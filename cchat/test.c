@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <winsock2.h>
+#include <wchar.h>
 #pragma comment(lib, "ws2_32")
 
 long long user_list[100] = {-1};
@@ -9,8 +10,8 @@ int user_size = 0;
 
 typedef struct _ChatMessage {
 	int userid;
-	char name[20];
-	char msg[100];
+	wchar_t name[20];
+	wchar_t msg[100];
 } ChatMessage;
 
 //void send_msg(SOCKET csock) {
@@ -23,7 +24,7 @@ typedef struct _ChatMessage {
 //}
 void recv_msg(SOCKET csock) {
 	while (1) {
-		char rbuff[1024] = { 0 };
+		wchar_t rbuff[1024] = { 0 };
 		recv(csock, rbuff, 1024, 0);
 		//ChatMessage chat_message;
 		//memcpy(&chat_message, rbuff, sizeof(ChatMessage));
@@ -53,13 +54,13 @@ void my_accept(SOCKET sock) {
 	printf("연결 성공!!\n");
 	printf("연결된 소켓 번호 : %d \n", csock);
 
-	char rbuff[1024] = { 0 };
+	wchar_t rbuff[1024] = { 0 };
 	user_list[user_size++] = csock;
 	int size = sizeof(csock);
 
 	memcpy(rbuff, &csock, sizeof(csock));
 	send(csock, rbuff, 1024, 0);
-	recv(csock, rbuff, 1024, 0);
+	//recv(csock, rbuff, 1024, 0);
 	// 8. 데이터 송수신 - send() / recv()
 	// send(sock, buff, len, flags)
 	// recv(sock, buff, len, flags)

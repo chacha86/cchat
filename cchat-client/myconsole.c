@@ -10,7 +10,7 @@ void gotoxy(int x, int y) {
 }
 
 int x_pos = 20;
-int y_pos = 0;
+int y_pos = 1;
 
 void setxy(int x, int y) {
 	x_pos = x;
@@ -62,8 +62,8 @@ char* run_my_console() {
 				break;
 			}
 
-			if (ch == L'\n') {
-				tmp_msg[msg_idx++] = L'\n';
+			if (ch == 13) {
+				tmp_msg[msg_idx++] = L'\r\n';
 				tmp_msg[msg_idx] = L'\0';
 				memcpy(msg, tmp_msg, sizeof(msg));
 				y_pos++;
@@ -84,7 +84,12 @@ char* run_my_console() {
 				tmp_msg[tmp_msg_size++] = ch;
 				msg_idx++;
 				gotoxy(x_pos, y_pos);
-				x_pos++;
+				if (ch >= 32 && ch < 127) {
+					x_pos++;
+				}
+				else {
+					x_pos+=2;
+				}
 				wprintf(L"%lc", ch);
 			}
 

@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define HAVE_STRUCT_TIMESPEC
 #include <stdio.h>
@@ -21,7 +22,7 @@
 
 typedef struct _ChatMessage {
 	int userid;
-	char name[20];
+	wchar_t name[20];
 	wchar_t msg[100];
 } ChatMessage;
 
@@ -77,15 +78,15 @@ void recv_msg(SOCKET csock) {
 		msg_list[msg_size++] = chat_message;
 
 		system("cls");
-		for (int i = 0; i < msg_size; i++) {
-			wprintf("%ls(%d) : %ls", msg_list[i]->name, msg_list[i]->userid, msg_list[i]->msg);
+		for (int i = 1; i < msg_size; i++) {
+			wprintf(L"%ls(%d) : %ls\n", msg_list[i]->name, msg_list[i]->userid, msg_list[i]->msg);
 		}
 		sety(msg_size);
 		int tox = get_tmp_msg_size();
 		wchar_t* tmp_msg = get_msg();
 		printf("========================================================\n");
 		printf("보낼 메시지 입력 : ");
-		printf("%s", tmp_msg);
+		wprintf(L"%ls", tmp_msg);
 		setx(tox);
 
 	}
@@ -104,8 +105,8 @@ void init(SOCKET csock) {
 
 	printf("이름을 입력해주세요 : ");
 	//scanf_s("%s", name, 20);
-	wscanf_s(L"%s", name, 20);
-	wprintf("안녕하세요 %s(%d)님!", name, user_id);
+	wscanf(L"%ls", name);
+	wprintf(L"안녕하세요 %ls(%d)님!", name, user_id);
 	printf("계속하려면 엔터를 누르세요\n");
 
 	while (1) {
