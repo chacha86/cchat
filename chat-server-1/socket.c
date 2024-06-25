@@ -8,7 +8,19 @@
 #include <windows.h>
 #pragma comment(lib, "ws2_32")
 
-SOCKET new_socket(char* ip, int port) {
+#define MAX_CONN_SIZE 5
+
+static int port = 9999;
+
+int socket__get_port() {
+	return port;
+}
+
+int socket__get_conn_size() {
+	return MAX_CONN_SIZE;
+}
+
+SOCKET socket__new_socket() {
 	WSADATA wsadata;
 	//char** msgList = (char**)malloc(sizeof(char*) * MSG_CAPACITY); // 총 1000개의 메시지 저장
 
@@ -43,7 +55,7 @@ SOCKET new_socket(char* ip, int port) {
 
 	SOCKADDR_IN addr;
 	addr.sin_family = AF_INET;
-	addr.sin_port = htons(9999); // 9000번대 이후로는 다 비어있음. 9000 ~ 63000
+	addr.sin_port = htons(port); // 9000번대 이후로는 다 비어있음. 9000 ~ 63000
 	addr.sin_addr.S_un.S_addr = ADDR_ANY;
 
 	// 5. 바인딩
@@ -64,13 +76,13 @@ SOCKET new_socket(char* ip, int port) {
 	// backlog - 저장소에 저장할 연결 정보 최대 갯수. 제일 먼저 저장된 것을 제일 먼저 뺀다.(큐)
 
 	printf("바인딩 성공!!\n");
-	listen(sock, 5);
+	listen(sock, MAX_CONN_SIZE);
 	printf("연결 대기\n");
 
 	return sock;
 }
 
-SOCKET my_accept(SOCKET sock) {
+SOCKET socket__my_accept(SOCKET sock) {
 
 	SOCKADDR_IN caddr;
 	SOCKET csock;
@@ -88,6 +100,5 @@ SOCKET my_accept(SOCKET sock) {
 
 	return csock;
 	
-
 }
 
