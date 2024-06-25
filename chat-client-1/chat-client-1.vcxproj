@@ -130,7 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.c" />
+    <ClCompile Include="client.c" />
     <ClCompile Include="socket.c" />
     <ClCompile Include="view.c" />
   </ItemGroup>
