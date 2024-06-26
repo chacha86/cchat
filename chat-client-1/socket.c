@@ -8,6 +8,7 @@
 #include <windows.h>
 #pragma comment(lib, "ws2_32")
 
+// 클라이언트 소켓을 생성하기 위한 함수. 접속할 서버의 IP와 PORT 번호를 입력받는다.
 SOCKET new_socket(char* ip, int port) {
 	WSADATA wsadata;
 

@@ -8,10 +8,16 @@
 #include <windows.h>
 #pragma comment(lib, "ws2_32")
 
+// define은 값의 치환이다. 해당 파일의 코드에서 MAX_CONN_SIZE는 컴파일 할 때 5로 치환된다.
 #define MAX_CONN_SIZE 5
 
+// static은 다른 파일에서 해당 변수에 접근할 수 없도록 설정하는 것이다. 자바의 private과 유사하다.
+// 전역변수를 여러 파일에서 접근하게 하면 나중에 관리하기가 힘들어지기 때문에 해당 파일에서만 사용하도록 하는 것.
+// 아래는 서버가 채팅 프로그램을 실행할 때 사용할 포트번호이다.
 static int port = 9999;
 
+// static이 붙은 port는 다른 파일에서 접근할 수 없으므로 혹시라도 필요하면 아래 함수를 이용해 가져갈 수 있다.
+// 자바의 getter와 유사하다
 int socket__get_port() {
 	return port;
 }
@@ -20,6 +26,7 @@ int socket__get_conn_size() {
 	return MAX_CONN_SIZE;
 }
 
+// 서버용 소켓을 생성해서 반환하는 함수
 SOCKET socket__new_socket() {
 	WSADATA wsadata;
 	//char** msgList = (char**)malloc(sizeof(char*) * MSG_CAPACITY); // 총 1000개의 메시지 저장
@@ -82,6 +89,7 @@ SOCKET socket__new_socket() {
 	return sock;
 }
 
+// 서버 소켓을 인수로 받아서 해당 서버가 연결을 수립하도록 accept하는 함수.
 SOCKET socket__my_accept(SOCKET sock) {
 
 	SOCKADDR_IN caddr;
