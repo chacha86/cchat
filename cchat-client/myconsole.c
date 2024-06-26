@@ -33,7 +33,6 @@ int sety(int y) {
 	y_pos = y;
 }
 
-static wchar_t msg[1000];
 static wchar_t tmp_msg[1000];
 static int tmp_msg_size = 0;
 
@@ -63,7 +62,7 @@ char* run_my_console() {
 			}
 
 			if (ch == 13) {
-				tmp_msg[msg_idx++] = L'\r\n';
+				//tmp_msg[msg_idx++] = L'\r\n';
 				tmp_msg[msg_idx] = L'\0';
 				memcpy(msg, tmp_msg, sizeof(msg));
 				y_pos++;

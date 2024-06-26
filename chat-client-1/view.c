@@ -1,7 +1,7 @@
 #include <stdio.h>
 #define NAME_SIZE 20
 
-void input_name_view(int user_id, wchar_t* name) {
+void view__input_name(int user_id, wchar_t* name) {
 	
 	printf("이름을 입력해주세요 : ");
 	wscanf_s(L"%ls", name, NAME_SIZE);
@@ -17,7 +17,10 @@ void input_name_view(int user_id, wchar_t* name) {
 	}
 }
 
-void message_input_view() {
+void view__input_message(wchar_t* tmp_msg, int tmp_msg_size) {
 	printf("========================================================\n");
-	printf("보낼 메시지 입력 : ");
+	printf("보낼 메시지 입력 :  ");
+	for (int i = 0; i < tmp_msg_size; i++) {
+		wprintf(L"%lc", tmp_msg[i]);
+	}
 }

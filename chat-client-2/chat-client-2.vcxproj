@@ -133,6 +133,7 @@
     <ClCompile Include="..\chat-client-1\client.c" />
     <ClCompile Include="..\chat-client-1\socket.c" />
     <ClCompile Include="..\chat-client-1\view.c" />
+    <ClCompile Include="myconsole.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

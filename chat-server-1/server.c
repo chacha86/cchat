@@ -10,7 +10,7 @@
 typedef struct _ChatMessage {
 	int userid;
 	wchar_t name[20];
-	wchar_t msg[100];
+	wchar_t msg[200];
 } ChatMessage;
 
 SOCKET* client_list;
@@ -28,7 +28,7 @@ void destroy() {
 	}
 }
 
-ChatMessage get_msg_data(wchar_t* buff) {
+ChatMessage get_msg_data(char* buff) {
 	ChatMessage chat_message;
 	memcpy(&chat_message, buff, sizeof(chat_message));
 	return chat_message;
@@ -37,8 +37,9 @@ ChatMessage get_msg_data(wchar_t* buff) {
 void recv_msg(SOCKET client) {
 	while (1) {
 
-		wchar_t buffer[BUFFER_SIZE] = { 0 };
+		char buffer[BUFFER_SIZE] = { 0 };
 
+		printf("수신 대기중..\n");
 		int recv_byte_size = recv(client, buffer, BUFFER_SIZE, 0);
 		if (recv_byte_size < 0) {
 			printf("데이터 수신 중 이상 발생!\n");

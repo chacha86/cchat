@@ -3,6 +3,7 @@
 #include <WinSock2.h>
 #include <wchar.h>
 #include <pthread.h>
+#include <stdlib.h>
 #define BUFFER_SIZE 1024
 
 typedef struct _ChatMessage {
@@ -19,44 +20,45 @@ wchar_t name[20];
 ChatMessage* msg_list[100];
 int msg_size = 0;
 
-void set_msg_data(int userid, wchar_t* name, wchar_t* msg, wchar_t* sbuff) {
+void set_msg_data(int userid, wchar_t* name, wchar_t* msg, char* sbuff) {
 	ChatMessage chat_message;
 	chat_message.userid = userid;
 	memcpy(chat_message.name, name, sizeof(chat_message.name));
 	memcpy(chat_message.msg, msg, sizeof(chat_message.msg));
-	memcpy(sbuff, &chat_message, sizeof(chat_message));
+	memcpy(sbuff, &chat_message, sizeof(ChatMessage));
 }
 
-ChatMessage* add_msg(wchar_t* buff) {
-	ChatMessage* chat_message = malloc(sizeof(ChatMessage));
+ChatMessage* add_msg(char* buff) {
+	ChatMessage* chat_message = (ChatMessage*)malloc(sizeof(ChatMessage));
 	memcpy(chat_message, buff, sizeof(ChatMessage));
 	msg_list[msg_size++] = chat_message;
 	return chat_message;
 }
 
 void send_msg() {
-	message_input_view();
+	//view__input_message(NULL);
 	while (1) {
-		wchar_t sbuff[BUFFER_SIZE] = { 0 };
+		char sbuff[BUFFER_SIZE] = { 0 };
 		wchar_t msg[200];
-		fgetws(msg, 200, stdin);
+		//fgetws(msg, 200, stdin);
+		myconsole__input(msg, 200);
 		set_msg_data(sock, name, msg, sbuff);
 		send(sock, sbuff, BUFFER_SIZE, 0);
 	}
 }
 
-
 void recv_msg(SOCKET csock) {
 
 	while (1) {
-		wchar_t rbuff[1024] = { 0 };
+		char rbuff[1024] = { 0 };
 		recv(csock, rbuff, 1024, 0);
 		add_msg(rbuff);
 		system("cls");
-		for (int i = 1; i < msg_size; i++) {
-			wprintf(L"%ls(%d) : %ls", msg_list[i]->name, msg_list[i]->userid, msg_list[i]->msg);
+		for (int i = 0; i < msg_size; i++) {
+			wprintf(L"%ls(%d) : %ls\n", msg_list[i]->name, msg_list[i]->userid, msg_list[i]->msg);
 		}
-		message_input_view();
+		myconsole__nextline();
+		myconsole__restore_input();
 	}
 }
 
@@ -66,7 +68,7 @@ int main() {
 
 	sock = new_socket("127.0.0.1", 9999);
 
-	input_name_view(sock, name);
+	view__input_name(sock, name);
 
 	//wprintf(L"%ls", name);
 

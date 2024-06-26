@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\chat-client-2\myconsole.c" />
     <ClCompile Include="client.c" />
     <ClCompile Include="socket.c" />
     <ClCompile Include="view.c" />
